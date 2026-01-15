@@ -6,12 +6,54 @@
 Bruna, Nunes, Rodrigo
 
 **Professor:** Jayr
-**Data:** 08/01/2026
+**Data:** 15/01/2026
 
----
 
-## Sobre o Projeto
-Esse trabalho é um sistema simples para controlar receitas e despesas do mês, feito em Python usando orientação a objetos. Tudo funciona pelo terminal, então é só rodar e usar o menu.
+## Requisitos Atendidos
+
+- Cadastro, edição e exclusão de categorias de receita e despesa (com validação de duplicidade e limite)
+- Lançamento de receitas e despesas com validação rigorosa (valor > 0, associação à categoria)
+- Controle de limite mensal por categoria
+- Cálculo automático de saldo diário e mensal
+- Alertas automáticos: limite excedido, alto valor, saldo negativo
+- Relatórios: total por categoria, por forma de pagamento, percentual, mês mais econômico, comparativo de meses
+- Configurações personalizáveis em settings.json
+- Persistência em JSON
+- Testes automatizados com pytest
+
+### Padrões de POO Utilizados
+- **Herança:** Lancamento → Receita/Despesa
+- **Encapsulamento:** uso de `@property` para proteger atributos e garantir validações
+- **Métodos especiais:** `__str__`, `__repr__`, `__eq__`, `__lt__`, `__add__` para facilitar comparação, ordenação e exibição
+- **Relacionamentos:** OrcamentoMensal agrupa lançamentos, Categoria vincula lançamentos
+
+## Alertas Automáticos
+- Despesa acima do valor mínimo configurado → alerta “alto valor”
+- Despesa que ultrapassa limite da categoria → alerta “limite excedido”
+- Saldo negativo no mês → alerta “déficit orçamentário”
+Todos os alertas são registrados e exibidos ao usuário.
+
+## Configurações (settings.json)
+O sistema permite personalizar parâmetros importantes no arquivo `settings.json`:
+
+```json
+{
+   "valor_minimo_alerta": 500,
+   "meses_comparativo": 3,
+   "meta_economia_percentual": 10
+}
+```
+Esses valores podem ser ajustados conforme sua necessidade. O sistema lê e aplica essas configurações automaticamente.
+
+## Tipos de Relatório Disponíveis
+- Total de despesas por categoria
+- Grupos de despesas por forma de pagamento
+- Percentual de cada categoria em relação ao total de despesas
+- Mês mais econômico (menor total de despesas)
+- Comparativo de receitas e despesas nos últimos meses (configurável)
+
+
+Esse projeto é um sistema simples pra controlar receitas e despesas do mês, feito em Python usando orientação a objetos. Tudo funciona pelo terminal, então é só rodar e usar o menu. O código foi feito pensando em facilitar a vida de quem quer organizar o dinheiro sem complicação.
 
 ### Principais Classes
 - Categoria: define se é receita ou despesa, tem nome, tipo, limite e descrição.
@@ -39,6 +81,7 @@ Rodrigo: persistência, relatórios, configuração, interface
 - **Classes:** Lancamento, Receita, Despesa, Categoria.
 - **Tarefas:** Implementação da herança, validações de tipos (setters), criação do Enum de Pagamento e encapsulamento dos dados básicos.
 
+Antonia Bruna Silva dos Santos
 ### Francisco Nunes Lopes da Silva
 - **Foco:** Regras de Negócio e Controle.
 - **Classes:** OrcamentoMensal, GerenciadorFinanceiro, Alerta.
@@ -53,21 +96,22 @@ Rodrigo: persistência, relatórios, configuração, interface
 
 ## Diagrama UML (textual)
 
-Diagrama UML (bem simples, só pra ilustrar):
+Diagrama UML:
 
 Categoria
    |
 Lancamento (base)
-   |-- Receita
-   |-- Despesa
-OrcamentoMensal
-GerenciadorFinanceiro
-Relatorio
-Configuracao
-Persistencia
-InterfaceUsuario
-Alerta
-excecoes.py
+   |-- Receita  (métodos especiais: __str__, __repr__, __eq__, __lt__, __add__)
+   |-- Despesa  (métodos especiais: __str__, __repr__, __eq__, __lt__, __add__)
+OrcamentoMensal  <-- contém vários Lancamentos
+GerenciadorFinanceiro  <-- gerencia vários OrcamentoMensal e registra alertas automáticos
+Alerta  <-- usado para avisos de limite, gasto alto, déficit
+Relatorio  <-- gera relatórios e estatísticas
+Configuracao  <-- salva/carrega configs
+Persistencia  <-- salva/carrega dados JSON
+InterfaceUsuario  <-- menu CLI
+excecoes.py  <-- exceções customizadas
+tests/  <-- testes automáticos com pytest
 
 ---
 
@@ -75,10 +119,20 @@ excecoes.py
 
 ## Instruções de Instalação e Execução
 
+
 Como rodar:
 1. Baixe o projeto (pode usar git clone se quiser)
 2. Se quiser, crie um ambiente virtual (python3 -m venv venv)
-3. Rode o main.py (python3 main.py)
+3. Instale as dependências (pip install -r requirements.txt, se houver)
+4. Rode o main.py (python3 main.py)
+
+### Testes automáticos (pytest)
+Se quiser garantir que está tudo funcionando, rode os testes automáticos:
+
+```bash
+pytest -q tests/
+```
+Se aparecer tudo "passed", tá show! Se der erro, o terminal mostra onde foi.
 
 
 ## Exemplo de Uso
@@ -112,9 +166,19 @@ Quando rodar, vai aparecer um menu no terminal:
 Qualquer dúvida, só mexer no menu e testar! Se errar, o sistema avisa e você pode tentar de novo. Dá pra cadastrar receitas/despesas em qualquer mês/ano, consultar saldos antigos, ver relatórios detalhados e controlar tudo certinho!
 
 
-## Dados de Teste
+## Testes Automatizados
+O sistema possui testes automáticos usando pytest, cobrindo:
+- Criação e validação de categorias, receitas e despesas
+- Regras de negócio (limite, saldo, associação)
+- Métodos especiais (__repr__, __eq__, __lt__, __add__)
+- Alertas automáticos (alto valor, déficit orçamentário)
+- Integração entre classes principais
 
-Os dados são todos cadastrados pelo menu, não tem nada automático.
+Para rodar os testes, basta executar:
+```bash
+pytest -q tests/
+```
+Se todos passarem, o sistema está funcionando corretamente!
 
 
 ## Decisões de Design
